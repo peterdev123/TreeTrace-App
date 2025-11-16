@@ -31,7 +31,10 @@ async function bootstrap() {
     });
 
     app.enableCors({
-      origin: true, // Allow all origins temporarily
+      origin: [
+        "https://ancestree.onrender.com",
+        "http://localhost:3000"
+      ],
       credentials: true,
       methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
