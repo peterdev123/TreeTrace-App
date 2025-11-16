@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "next": "15.2.4",
     "@balkangraph/familytree.js": "^1.9.45",
     "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^4.1.3",
