@@ -89,6 +89,8 @@ function Familytree(props: {
   fetchData: () => Promise<void>
 }) {
   const treeContainer = useRef<HTMLDivElement | null>(null)
+  const isAddingMember = useRef<boolean>(false)
+  const familyInstanceRef = useRef<any>(null)
 
   useEffect(() => {
     const treeElement = document.getElementById("tree")
@@ -435,6 +437,9 @@ function Familytree(props: {
         anim: { func: FamilyTree.anim.outBack, duration: 300 },
       })
 
+      // Store the family instance in a ref so we can update it later
+      familyInstanceRef.current = family
+
       // Cast the family object to any to avoid TypeScript errors
       const familyAny = family as any
 
@@ -738,57 +743,7 @@ function Familytree(props: {
             }
 
             await props.fetchData()
-
-            // Force a complete tree redraw and ensure badges are properly attached
-            setTimeout(() => {
-              family.draw()
-
-              // Wait for the redraw to complete, then attach badge event handlers
-              setTimeout(() => {
-                // First, handle SVG badges
-                const svgBadges = document.querySelectorAll(".suggestion-badge-svg")
-                svgBadges.forEach((badge) => {
-                  const nodeElement = badge.closest("[data-n-id]")
-                  if (!nodeElement) return
-
-                  const nodeId = nodeElement.getAttribute("data-n-id")
-                  if (!nodeId) return
-
-                  // Clone and replace to remove old listeners
-                  const newBadge = badge.cloneNode(true)
-                  if (badge.parentNode) {
-                    badge.parentNode.replaceChild(newBadge, badge)
-                  }
-                  // Add fresh click handler
-                  ;(newBadge as any).style.cursor = "pointer"
-                  newBadge.addEventListener("click", (e) => {
-                    e.stopPropagation()
-                    e.preventDefault()
-                    window.location.href = `/dashboard/suggestions/${nodeId}`
-                    return false
-                  })
-                })
-
-                // Second, handle custom badges
-                const customBadges = document.querySelectorAll(".custom-suggestion-badge")
-                customBadges.forEach((badge) => {
-                  // Update href attribute to ensure it has the correct ID
-                  const nodeElement = badge.closest("[data-n-id]")
-                  if (!nodeElement) return
-
-                  const nodeId = nodeElement.getAttribute("data-n-id")
-                  if (!nodeId) return
-                  ;(badge as HTMLAnchorElement).href = `/dashboard/suggestions/${nodeId}`
-
-                  // Ensure click handler is working
-                  badge.addEventListener("click", (e) => {
-                    e.stopPropagation()
-                    e.preventDefault()
-                    window.location.href = `/dashboard/suggestions/${nodeId}`
-                  })
-                })
-              }, 500)
-            }, 300)
+            // Tree will automatically update via the useEffect that watches props.nodes
           } catch (error) {
             console.error("Error saving updated member:", error)
           }
@@ -972,6 +927,13 @@ function Familytree(props: {
         const token = localStorage.getItem("token")
         if (!token) return
 
+        // Check if we're already processing a member addition
+        const isAddMemberAction = ["addSon", "addDaughter", "father", "mother", "wife", "husband"].includes(args.menuItemName)
+        if (isAddMemberAction && isAddingMember.current) {
+          console.log("Member addition already in progress, ignoring duplicate click")
+          return false
+        }
+
         try {
           switch (args.menuItemName) {
             case "deleteNode": {
@@ -990,78 +952,75 @@ function Familytree(props: {
             }
             case "addSon":
             case "addDaughter": {
-              const gender = args.menuItemName === "addSon" ? "male" : "female"
-              const newMemberData = {
-                name: "Unknown",
-                surname: "Unknown",
-                gender: gender,
-                fatherId: undefined as any,
-                motherId: undefined as any,
-              }
+              // Set flag to prevent duplicate clicks
+              isAddingMember.current = true
 
-              if (node.gender === "male") {
-                newMemberData.fatherId = node.id
-                if (node.pids && node.pids[0]) {
-                  newMemberData.motherId = node.pids[0]
+              try {
+                const gender = args.menuItemName === "addSon" ? "male" : "female"
+                const newMemberData = {
+                  name: "Unknown",
+                  surname: "Unknown",
+                  gender: gender,
+                  fatherId: undefined as any,
+                  motherId: undefined as any,
                 }
-              } else {
-                newMemberData.motherId = node.id
-                if (node.pids && node.pids[0]) {
-                  newMemberData.fatherId = node.pids[0]
+
+                if (node.gender === "male") {
+                  newMemberData.fatherId = node.id
+                  if (node.pids && node.pids[0]) {
+                    newMemberData.motherId = node.pids[0]
+                  }
+                } else {
+                  newMemberData.motherId = node.id
+                  if (node.pids && node.pids[0]) {
+                    newMemberData.fatherId = node.pids[0]
+                  }
                 }
+
+                await handleAddMember(token, node, gender === "male" ? "son" : "daughter", props.fetchData, newMemberData)
+                // Tree will automatically update via the useEffect that watches props.nodes
+              } finally {
+                // Reset flag after operation completes
+                isAddingMember.current = false
               }
-
-              await handleAddMember(token, node, gender === "male" ? "son" : "daughter", props.fetchData, newMemberData)
-
-              // After adding a member, force tree redraw and reattach badge handlers
-              setTimeout(() => {
-                family.draw()
-                setTimeout(() => {
-                  // Handle SVG badges
-                  document.querySelectorAll(".suggestion-badge-svg").forEach((badge) => {
-                    const nodeElement = badge.closest("[data-n-id]")
-                    if (!nodeElement) return
-
-                    const nodeId = nodeElement.getAttribute("data-n-id")
-                    if (!nodeId) return
-
-                    badge.addEventListener("click", (e) => {
-                      e.stopPropagation()
-                      e.preventDefault()
-                      window.location.href = `/dashboard/suggestions/${nodeId}`
-                    })
-                  })
-
-                  // Handle custom badges
-                  document.querySelectorAll(".custom-suggestion-badge").forEach((badge) => {
-                    const nodeElement = badge.closest("[data-n-id]")
-                    if (!nodeElement) return
-
-                    const nodeId = nodeElement.getAttribute("data-n-id")
-                    if (!nodeId) return
-                    ;(badge as HTMLAnchorElement).href = `/dashboard/suggestions/${nodeId}`
-                    badge.addEventListener("click", (e) => {
-                      e.stopPropagation()
-                      e.preventDefault()
-                      window.location.href = `/dashboard/suggestions/${nodeId}`
-                    })
-                  })
-                }, 500)
-              }, 300)
 
               break
             }
             case "father":
-              await handleAddMember(token, node, "father", props.fetchData)
+              // Set flag to prevent duplicate clicks
+              isAddingMember.current = true
+              try {
+                await handleAddMember(token, node, "father", props.fetchData)
+              } finally {
+                isAddingMember.current = false
+              }
               break
             case "mother":
-              await handleAddMember(token, node, "mother", props.fetchData)
+              // Set flag to prevent duplicate clicks
+              isAddingMember.current = true
+              try {
+                await handleAddMember(token, node, "mother", props.fetchData)
+              } finally {
+                isAddingMember.current = false
+              }
               break
             case "wife":
-              await handleAddMember(token, node, "wife", props.fetchData)
+              // Set flag to prevent duplicate clicks
+              isAddingMember.current = true
+              try {
+                await handleAddMember(token, node, "wife", props.fetchData)
+              } finally {
+                isAddingMember.current = false
+              }
               break
             case "husband":
-              await handleAddMember(token, node, "husband", props.fetchData)
+              // Set flag to prevent duplicate clicks
+              isAddingMember.current = true
+              try {
+                await handleAddMember(token, node, "husband", props.fetchData)
+              } finally {
+                isAddingMember.current = false
+              }
               break
             case "medicalHistory":
               // Navigate to the medical history page with the member ID
@@ -1075,11 +1034,35 @@ function Familytree(props: {
           }
         } catch (error) {
           console.error("Error handling member addition:", error)
+          // Reset flag on error
+          if (isAddMemberAction) {
+            isAddingMember.current = false
+          }
         }
         return true
       })
     }
-  }, [props.nodeBinding, props.nodes, props.fetchData])
+  }, [props.nodeBinding, props.fetchData])
+
+  // Update tree nodes when props.nodes changes (but skip initial mount since tree is already initialized with nodes)
+  useEffect(() => {
+    if (familyInstanceRef.current && props.nodes) {
+      // Update the tree with new nodes
+      try {
+        const family = familyInstanceRef.current as any
+        // Update nodes and redraw the tree
+        if (family.nodes) {
+          family.nodes = props.nodes
+          family.draw()
+        } else {
+          // Fallback: use load method if nodes property doesn't exist
+          family.load(props.nodes)
+        }
+      } catch (error) {
+        console.error("Error updating tree nodes:", error)
+      }
+    }
+  }, [props.nodes])
 
   return (
     <div className="h-full w-full">
