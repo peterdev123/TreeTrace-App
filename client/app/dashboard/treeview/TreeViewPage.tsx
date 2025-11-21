@@ -1,3 +1,40 @@
+// "use client"
+
+// import dynamic from 'next/dynamic'
+// import { Suspense } from 'react'
+
+// // Dynamically import the treeview component to ensure it only runs on client-side
+// const TreeViewPage = dynamic(() => import('./TreeViewPage'), {
+//   ssr: false,
+//   loading: () => (
+//     <div className="min-h-screen bg-black text-white flex items-center justify-center">
+//       <div className="text-center">
+//         <div className="w-16 h-16 mx-auto bg-teal-500/20 rounded-full flex items-center justify-center mb-4">
+//           <div className="w-8 h-8 text-teal-400 animate-pulse">🌳</div>
+//         </div>
+//         <p className="text-gray-400">Loading family tree...</p>
+//       </div>
+//     </div>
+//   )
+// })
+
+// export default function TreeViewWrapper() {
+//   return (
+//     <Suspense fallback={
+//       <div className="min-h-screen bg-black text-white flex items-center justify-center">
+//         <div className="text-center">
+//           <div className="w-16 h-16 mx-auto bg-teal-500/20 rounded-full flex items-center justify-center mb-4">
+//             <div className="w-8 h-8 text-teal-400 animate-pulse">🌳</div>
+//           </div>
+//           <p className="text-gray-400">Loading family tree...</p>
+//         </div>
+//       </div>
+//     }>
+//       <TreeViewPage />
+//     </Suspense>
+//   )
+// }
+
 "use client"
 
 import { useEffect, useState, useRef, useMemo, useCallback } from "react"
@@ -52,15 +89,8 @@ function Familytree(props: {
   fetchData: () => Promise<void>
 }) {
   const treeContainer = useRef<HTMLDivElement | null>(null)
-  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
-    setIsClient(true)
-  }, [])
-
-  useEffect(() => {
-    if (!isClient) return
-    
     const treeElement = document.getElementById("tree")
     if (treeElement) {
       const svgContent = `
@@ -1050,19 +1080,6 @@ function Familytree(props: {
       })
     }
   }, [props.nodeBinding, props.nodes, props.fetchData])
-
-  if (!isClient) {
-    return (
-      <div className="h-full w-full flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto bg-teal-500/20 rounded-full flex items-center justify-center mb-4">
-            <TreePine className="w-8 h-8 text-teal-400 animate-pulse" />
-          </div>
-          <p className="text-gray-400">Loading family tree...</p>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="h-full w-full">
