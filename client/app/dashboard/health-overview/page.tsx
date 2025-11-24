@@ -752,7 +752,7 @@ export default function HealthOverviewPage() {
                     ) : (
                       <>
                         <FileText className="h-4 w-4" />
-                        Generate Report
+                        Create Summary
                       </>
                     )}
                   </button>
@@ -978,7 +978,7 @@ export default function HealthOverviewPage() {
                   ) : (
                     <>
                       <FileText className="w-5 h-5 group-hover:animate-pulse" />
-                      Create Comprehensive Health Report
+                      Create Health Summary
                     </>
                   )}
                 </button>
