@@ -299,11 +299,9 @@ export default function Home() {
           <Link href="/auth/login" className="text-gray-400 hover:text-white transition-colors">
             Login
           </Link>
-          <Link href="/auth/signup">
-            <Button className="bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white border-0 shadow-lg">
-              Get Started
-            </Button>
-          </Link>
+          <Button asChild className="bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white border-0 shadow-lg whitespace-nowrap">
+            <Link href="/auth/signup">Get Started</Link>
+          </Button>
         </nav>
       </header>
 
@@ -354,15 +352,16 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.5 }}
             className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
           >
-            <Link href="/auth/signup">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
-              >
+            <Button
+              asChild
+              size="lg"
+              className="bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center justify-center gap-2 whitespace-nowrap"
+            >
+              <Link href="/auth/signup">
                 Start Your Tree
                 <ArrowRight className="w-5 h-5" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
             <Button
               size="lg"
               variant="outline"
@@ -545,15 +544,16 @@ export default function Home() {
             <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-8">
               Join thousands of families preserving their heritage and health history with TreeTrace
             </p>
-            <Link href="/auth/signup">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white px-12 py-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-lg flex items-center gap-3 mx-auto"
-              >
+            <Button
+              asChild
+              size="lg"
+              className="bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-lg inline-flex items-center justify-center gap-2 whitespace-nowrap mx-auto"
+            >
+              <Link href="/auth/signup">
                 Create Your Family Tree
-                <ArrowRight className="w-6 h-6" />
-              </Button>
-            </Link>
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Link>
+            </Button>
           </div>
         </motion.section>
 
@@ -643,15 +643,16 @@ export default function Home() {
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                   <p className="text-sm text-gray-400">Ready to start building your family tree?</p>
                   <div className="flex gap-3">
-                    <Link href="/auth/signup">
-                      <Button
-                        className="bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white rounded-lg shadow-lg"
-                        onClick={() => setShowVideo(false)}
-                      >
+                    <Button
+                      asChild
+                      className="bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white rounded-lg shadow-lg whitespace-nowrap"
+                      onClick={() => setShowVideo(false)}
+                    >
+                      <Link href="/auth/signup">
                         Get Started
                         <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
-                    </Link>
+                      </Link>
+                    </Button>
                   </div>
                 </div>
               </div>
