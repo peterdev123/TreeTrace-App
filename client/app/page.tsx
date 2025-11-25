@@ -303,6 +303,15 @@ export default function Home() {
             <Link href="/auth/signup">Get Started</Link>
           </Button>
         </nav>
+        {/* Mobile nav actions */}
+        <nav className="flex md:hidden items-center gap-4">
+          <Link href="/auth/login" className="text-gray-400 hover:text-white transition-colors whitespace-nowrap">
+            Login
+          </Link>
+          <Button asChild className="bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white border-0 shadow-lg whitespace-nowrap">
+            <Link href="/auth/signup">Get Started</Link>
+          </Button>
+        </nav>
       </header>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
