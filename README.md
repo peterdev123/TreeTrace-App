@@ -220,6 +220,13 @@ git push origin feature/amazing-feature
 
 ---
 
+## Dummy Account For Testing
+
+* Email: BryanTrillium123@gmail.com
+* Password: DummyTestPassword123
+
+---
+
 ## 📞 Support
 
 Need help? We're here for you!
@@ -243,3 +250,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 </div>
 
 ---
+
